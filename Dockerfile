@@ -24,7 +24,7 @@ RUN yum install -y gcc \
     libtool && ln -s /usr/lib64/libssl.so /usr/lib/ && \
     rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm \
     && yum install -y nginx && yum install -y php && \
-    curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew && \
+    curl -L -O http://laoyuegou-web.oss-cn-hangzhou.aliyuncs.com/lizixing/phpbrew && \
     chmod +x phpbrew && \
     mv phpbrew /usr/bin/phpbrew && \
     cd ~ && phpbrew init && \
