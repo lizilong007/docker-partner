@@ -30,6 +30,9 @@ RUN yum install -y gcc \
     cd ~ && phpbrew init && \
     echo "[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc" >> ~/.bashrc && \
     source ~/.phpbrew/bashrc && \
+    wget http://www.atomicorp.com/installers/atomic && \
+    sh ./atomic && \
+    yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel && \
     phpbrew install php-7.1.0 as php-7.1 +default +mysql +pdo +fpm +curl && \
     phpbrew switch php-7.1 && \
     wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz && \
