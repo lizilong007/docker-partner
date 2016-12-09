@@ -9,6 +9,10 @@ dockerfile bulid phpbrew+php+nginx Environment
 ```
 docker build -t partner
 ```
+    If hesitant network causes mirror to build slowly, can I build a good image
+```
+docker pull daocloud.io/lizilong/partner:latest
+```
 
 # Getting it running
 To run nginx in the blackgroud process, simply start the container useing the following command:
