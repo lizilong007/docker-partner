@@ -61,6 +61,11 @@ ADD config/upstream.conf.enable /etc/nginx/conf.d/upstream.conf.enable
 ADD config/vhosts/* /etc/nginx/vhosts/
 
 # start-up nginx and fpm
-CMD service nginx start && phpbrew use php-7.1 && phpbrew fpm start
+CMD service nginx start && \
+    phpbrew init && \
+    [[ -e ~/.phpbrew/bashrc ]] && \
+    source ~/.phpbrew/bashrc && \
+    phpbrew use php-7.1 && \
+    phpbrew fpm start
 
 
