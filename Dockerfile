@@ -1,7 +1,7 @@
 FROM daocloud.io/centos:6
 MAINTAINER Ice Dragon <517icedragon@gmail.com>
 
-#
+#install nginx/php-5.3/phpbrew/php-7.1 +default +mysql +pdo +fpm +curl +memcached
 RUN yum install -y gcc \
     libxml2-devel \
     libxslt-devel \
@@ -41,8 +41,26 @@ RUN yum install -y gcc \
     ./configure && \
     make && \
     make install && \
-    phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl
+    phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl && \
+    # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
+    sed -i "s/listen = /root/.phpbrew/php/php-7.1/var/run/php-fpm.sock/listen = 127.0.0.1:9000/" /root/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
+    sed -i "s/short_open_tag = Off/short_open_tag = On/" /root/.phpbrew/php/php-7.1/etc/php.ini && \
+    mkdir -p /etc/nginx/vhosts && rm -f /etc/nginx/nginx.conf
 
+# Manually set up the nginx log dir,php.ini and php-fpm config file environment variables
+ENV NGINX_LOG_DIR /var/log/nginx
+ENV PHPINI_FILE_PAHT /root/.phpbrew/php/php-7.1/etc
+ENV PHPFPM_FILE_PATH /root/.phpbrew/php/php-7.1/etc/php-fpm.d
 
+# Expose nginx
+EXPOSE 80
+
+# Update the default nginx site with the config we created.
+ADD config/nginx.conf /etc/nginx/nginx.conf
+ADD config/upstream.conf.enable /etc/nginx/conf.d/upstream.conf.enable
+ADD config/vhosts/* /etc/nginx/vhosts/
+
+# start-up nginx and fpm
+CMD service nginx start && phpbrew use php-7.1 && phpbrew fpm start
 
 
