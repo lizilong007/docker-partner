@@ -57,7 +57,7 @@ EXPOSE 80
 
 # Update the default nginx site with the config we created.
 ADD config/nginx.conf /etc/nginx/nginx.conf
-ADD config/upstream.conf.enable /etc/nginx/conf.d/upstream.conf.enabled
+ADD config/upstream.conf.enabled /etc/nginx/conf.d/upstream.conf.enabled
 ADD config/vhosts/* /etc/nginx/vhosts/
 
 # start-up nginx and fpm
