@@ -67,6 +67,6 @@ CMD service nginx start && \
     source ~/.phpbrew/bashrc && \
     phpbrew use php-7.1 && \
     phpbrew fpm start && \
-    /usr/bin/supervisord
+    tail -f /var/log/nginx/error.log
 
 
