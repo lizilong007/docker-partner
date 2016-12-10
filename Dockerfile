@@ -69,7 +69,7 @@ ADD config/nginx.conf /etc/nginx/nginx.conf
 ADD config/upstream.conf.enabled /etc/nginx/conf.d/upstream.conf.enabled
 ADD config/vhosts/* /etc/nginx/vhosts/
 # Update the enable public keys
-ADD config/id_rsa/*.pub.enabled ~/.ssh/id_rsa.pub/
+ADD config/id_rsa/*.pub.enabled /root/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
 CMD service nginx start && \
