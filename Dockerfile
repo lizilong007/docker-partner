@@ -45,7 +45,7 @@ RUN yum install -y gcc \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
     sed -i "s/listen = \/root\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /root/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
     sed -i "s/short_open_tag = Off/short_open_tag = On/" /root/.phpbrew/php/php-7.1/etc/php.ini && \
-    mkdir -p /etc/nginx/vhosts && rm -f /etc/nginx/nginx.conf \
+    mkdir -p /etc/nginx/vhosts && rm -f /etc/nginx/nginx.conf && \
     # Config ssh login container
     sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
     sed -i "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config && \
