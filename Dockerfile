@@ -32,7 +32,7 @@ RUN yum install -y gcc \
     source ~/.phpbrew/bashrc && \
     wget http://www.atomicorp.com/installers/atomic && \
     sh ./atomic && \
-    yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel supervisor && \
+    yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel supervisor openssh-server && \
     phpbrew install php-7.1.0 as php-7.1 +default +mysql +pdo +fpm +curl && \
     phpbrew switch php-7.1 && \
     wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz && \
@@ -45,28 +45,41 @@ RUN yum install -y gcc \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
     sed -i "s/listen = \/root\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /root/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
     sed -i "s/short_open_tag = Off/short_open_tag = On/" /root/.phpbrew/php/php-7.1/etc/php.ini && \
-    mkdir -p /etc/nginx/vhosts && rm -f /etc/nginx/nginx.conf
+    mkdir -p /etc/nginx/vhosts && rm -f /etc/nginx/nginx.conf \
+    # Config ssh login container
+    sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
+    sed -i "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config && \
+    ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -P '' && \
+    ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P '' && \
+    ## Public keys dir
+    mkdir -p ~/.ssh/id_rsa.pub/
+
 
 # Manually set up the nginx log dir,php.ini and php-fpm config file environment variables
 ENV NGINX_LOG_DIR /var/log/nginx
 ENV PHPINI_FILE_PAHT /root/.phpbrew/php/php-7.1/etc
 ENV PHPFPM_FILE_PATH /root/.phpbrew/php/php-7.1/etc/php-fpm.d
 
-# Expose nginx
+# Expose nginx ssh
 EXPOSE 80
+EXPOSE 22
 
 # Update the default nginx site with the config we created.
 ADD config/nginx.conf /etc/nginx/nginx.conf
 ADD config/upstream.conf.enabled /etc/nginx/conf.d/upstream.conf.enabled
 ADD config/vhosts/* /etc/nginx/vhosts/
+# Update the enable public keys
+ADD config/id_rsa/*.pub.enabled ~/.ssh/id_rsa.pub/
 
-# start-up nginx and fpm
+# start-up nginx and fpm and ssh
 CMD service nginx start && \
     phpbrew init && \
     [[ -e ~/.phpbrew/bashrc ]] && \
     source ~/.phpbrew/bashrc && \
     phpbrew use php-7.1 && \
     phpbrew fpm start && \
-    tail -f /var/log/nginx/error.log
+    cat ~/.ssh/id_rsa.pub/*.pub.enabled > ~/.ssh/authorized_keys && \
+    chmod 600 ~/.ssh/authorized_keys && \
+    /usr/sbin/sshd -D
 
 
