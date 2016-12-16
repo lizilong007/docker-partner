@@ -49,8 +49,8 @@ RUN cd ~ && \
     sudo make install && \
     phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl && \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
-    sed -i "s/listen = \/land\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /land/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
-    sed -i "s/short_open_tag = Off/short_open_tag = On/" /land/.phpbrew/php/php-7.1/etc/php.ini && \
+    sed -i "s/listen = ~\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" ~/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
+    sed -i "s/short_open_tag = Off/short_open_tag = On/" ~/.phpbrew/php/php-7.1/etc/php.ini && \
     sudo mkdir -p /etc/nginx/vhosts && sudo rm -f /etc/nginx/nginx.conf && \
     # Config ssh login container
     sudo sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
@@ -63,8 +63,8 @@ RUN cd ~ && \
 
 # Manually set up the nginx log dir,php.ini and php-fpm config file environment variables
 ENV NGINX_LOG_DIR /var/log/nginx
-ENV PHPINI_FILE_PAHT /land/.phpbrew/php/php-7.1/etc
-ENV PHPFPM_FILE_PATH /land/.phpbrew/php/php-7.1/etc/php-fpm.d
+ENV PHPINI_FILE_PAHT /home/land/.phpbrew/php/php-7.1/etc
+ENV PHPFPM_FILE_PATH /home/land/.phpbrew/php/php-7.1/etc/php-fpm.d
 
 # Expose nginx ssh
 EXPOSE 80
@@ -75,7 +75,7 @@ ADD config/nginx.conf /etc/nginx/nginx.conf
 ADD config/upstream.conf.enabled /etc/nginx/conf.d/upstream.conf.enabled
 ADD config/vhosts/* /etc/nginx/vhosts/
 # Update the enable public keys
-ADD config/id_rsa/*.pub.enabled /land/.ssh/id_rsa.pub/
+ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
 CMD su land && sudo service nginx start && \
