@@ -5,7 +5,8 @@ MAINTAINER Ice Dragon <517icedragon@gmail.com>
 RUN yum install -y sudo-devel && \
     useradd land && \
     sed -i '$a land    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers && \
-    su land && cd ~ && \
+    su land
+RUN cd ~ && \
     sudo yum install -y \
     gcc \
     libxml2-devel \
