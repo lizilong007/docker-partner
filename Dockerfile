@@ -2,7 +2,12 @@ FROM daocloud.io/centos:6
 MAINTAINER Ice Dragon <517icedragon@gmail.com>
 
 #install nginx/php-5.3/phpbrew/php-7.1 +default +mysql +pdo +fpm +curl +memcached
-RUN yum install -y gcc \
+RUN yum install -y sudo-devel && \
+    useradd land && \
+    sed -i '$a land    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers && \
+    su land && cd ~ && \
+    sudo yum install -y \
+    gcc \
     libxml2-devel \
     libxslt-devel \
     bzip2-devel \
@@ -21,18 +26,18 @@ RUN yum install -y gcc \
     wget \
     gcc+ \
     gcc-c++ \
-    libtool && ln -s /usr/lib64/libssl.so /usr/lib/ && \
-    rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm \
-    && yum install -y nginx && yum install -y php && \
+    libtool && sudo ln -s /usr/lib64/libssl.so /usr/lib/ && \
+    sudo rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm \
+    && sudo yum install -y nginx && sudo yum install -y php && \
     curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew && \
     chmod +x phpbrew && \
-    mv phpbrew /usr/bin/phpbrew && \
+    sudo mv phpbrew /usr/bin/phpbrew && \
     cd ~ && phpbrew init && \
     echo "[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc" >> ~/.bashrc && \
     source ~/.phpbrew/bashrc && \
     wget http://www.atomicorp.com/installers/atomic && \
     sh ./atomic && \
-    yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel supervisor openssh-server git && \
+    sudo yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel supervisor openssh-server git && \
     phpbrew install php-7.1.0 as php-7.1 +default +mysql +pdo +fpm +curl && \
     phpbrew switch php-7.1 && \
     wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz && \
@@ -40,25 +45,25 @@ RUN yum install -y gcc \
     cd libmemcached-1.0.18 && \
     ./configure && \
     make && \
-    make install && \
+    sudo make install && \
     phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl && \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
-    sed -i "s/listen = \/root\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /root/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
-    sed -i "s/short_open_tag = Off/short_open_tag = On/" /root/.phpbrew/php/php-7.1/etc/php.ini && \
-    mkdir -p /etc/nginx/vhosts && rm -f /etc/nginx/nginx.conf && \
+    sed -i "s/listen = \/land\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /land/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
+    sed -i "s/short_open_tag = Off/short_open_tag = On/" /land/.phpbrew/php/php-7.1/etc/php.ini && \
+    sudo mkdir -p /etc/nginx/vhosts && sudo rm -f /etc/nginx/nginx.conf && \
     # Config ssh login container
-    sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
-    sed -i "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config && \
+    sudo sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
+    sudo sed -i "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config && \
     ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -P '' && \
     ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P '' && \
     ## Public keys dir
-    mkdir -p ~/.ssh/id_rsa.pub/
+    sudo mkdir -p ~/.ssh/id_rsa.pub/
 
 
 # Manually set up the nginx log dir,php.ini and php-fpm config file environment variables
 ENV NGINX_LOG_DIR /var/log/nginx
-ENV PHPINI_FILE_PAHT /root/.phpbrew/php/php-7.1/etc
-ENV PHPFPM_FILE_PATH /root/.phpbrew/php/php-7.1/etc/php-fpm.d
+ENV PHPINI_FILE_PAHT /land/.phpbrew/php/php-7.1/etc
+ENV PHPFPM_FILE_PATH /land/.phpbrew/php/php-7.1/etc/php-fpm.d
 
 # Expose nginx ssh
 EXPOSE 80
@@ -69,17 +74,17 @@ ADD config/nginx.conf /etc/nginx/nginx.conf
 ADD config/upstream.conf.enabled /etc/nginx/conf.d/upstream.conf.enabled
 ADD config/vhosts/* /etc/nginx/vhosts/
 # Update the enable public keys
-ADD config/id_rsa/*.pub.enabled /root/.ssh/id_rsa.pub/
+ADD config/id_rsa/*.pub.enabled /land/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
-CMD service nginx start && \
+CMD su land && sudo service nginx start && \
     phpbrew init && \
     [[ -e ~/.phpbrew/bashrc ]] && \
     source ~/.phpbrew/bashrc && \
     phpbrew use php-7.1 && \
     phpbrew fpm start && \
     cat ~/.ssh/id_rsa.pub/*.pub.enabled > ~/.ssh/authorized_keys && \
-    chmod 600 ~/.ssh/authorized_keys && \
-    /usr/sbin/sshd -D
+    sudo chmod 600 ~/.ssh/authorized_keys && \
+    sudo /usr/sbin/sshd -D
 
 
