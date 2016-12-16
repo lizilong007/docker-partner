@@ -78,7 +78,8 @@ ADD config/vhosts/* /etc/nginx/vhosts/
 ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
-CMD su land && sudo service nginx start && \
+CMD su land
+CMD sudo service nginx start && \
     phpbrew init && \
     [[ -e ~/.phpbrew/bashrc ]] && \
     source ~/.phpbrew/bashrc && \
