@@ -77,16 +77,17 @@ ADD config/vhosts/* /etc/nginx/vhosts/
 # Update the enable public keys
 ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
+WORKDIR /home/land
 # start-up nginx and fpm and ssh
-CMD su land
-CMD sudo service nginx start && \
+CMD su land && sudo service nginx start && \
+    cd /home/land && \
     phpbrew init && \
-    [[ -e ~/.phpbrew/bashrc ]] && \
-    source ~/.phpbrew/bashrc && \
+    [[ -e /home/land/.phpbrew/bashrc ]] && \
+    source /home/land/.phpbrew/bashrc && \
     phpbrew use php-7.1 && \
     phpbrew fpm start && \
-    cat ~/.ssh/id_rsa.pub/*.pub.enabled > ~/.ssh/authorized_keys && \
-    sudo chmod 600 ~/.ssh/authorized_keys && \
+    cat /home/land/.ssh/id_rsa.pub/*.pub.enabled > /home/land/.ssh/authorized_keys && \
+    sudo chmod 600 /home/land/.ssh/authorized_keys && \
     sudo /usr/sbin/sshd -D
 
 
