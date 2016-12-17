@@ -81,12 +81,11 @@ ADD config/vhosts/* /etc/nginx/vhosts/
 ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
-CMD sudo /usr/sbin/sshd -D
-# su - land -c "sudo service nginx start && \
-#     phpbrew use php-7.1 && \
-#     phpbrew fpm start && \
-#     cat /home/land/.ssh/id_rsa.pub/*.pub.enabled > /home/land/.ssh/authorized_keys && \
-#     sudo chmod 600 /home/land/.ssh/authorized_keys && \
-#     sudo /usr/sbin/sshd -D"
+CMD sudo chown -R land:land ~ && sudo service nginx start && \
+    phpbrew use php-7.1 && \
+    phpbrew fpm start && \
+    sudo cat /home/land/.ssh/id_rsa.pub/*.pub.enabled > /home/land/.ssh/authorized_keys && \
+    sudo chmod 600 /home/land/.ssh/authorized_keys && \
+    sudo /usr/sbin/sshd -D
 
 
