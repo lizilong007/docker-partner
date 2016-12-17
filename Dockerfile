@@ -82,6 +82,9 @@ ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
 CMD sudo chown -R land:land ~ && sudo service nginx start && \
+    phpbrew init --root=/home/land && \
+    echo "[[ -e /home/land/.phpbrew/bashrc ]] && source /home/land/.phpbrew/bashrc" >> /home/land/.bashrc && \
+    source /home/land/.phpbrew/bashrc && \
     phpbrew use php-7.1 && \
     phpbrew fpm start && \
     sudo cat /home/land/.ssh/id_rsa.pub/*.pub.enabled > /home/land/.ssh/authorized_keys && \
