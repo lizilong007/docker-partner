@@ -40,15 +40,15 @@ RUN sudo yum install -y \
     echo "[[ -e /home/land/.phpbrew/bashrc ]] && source /home/land/.phpbrew/bashrc" >> /home/land/.bashrc && \
     source /home/land/.phpbrew/bashrc && \
     wget http://www.atomicorp.com/installers/atomic && \
-    sh ./atomic && \
+    sudo sh ./atomic && \
     sudo yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel supervisor openssh-server git && \
     phpbrew install php-7.1.0 as php-7.1 +default +mysql +pdo +fpm +curl && \
     phpbrew switch php-7.1 && \
     wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz && \
-    tar -zxvf libmemcached-1.0.18.tar.gz && \
+    sudo tar -zxvf libmemcached-1.0.18.tar.gz && \
     cd libmemcached-1.0.18 && \
-    ./configure && \
-    make && \
+    sudo ./configure && \
+    sudo make && \
     sudo make install && \
     phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl && \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
