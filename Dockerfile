@@ -52,7 +52,7 @@ RUN sudo yum install -y \
     sudo make install && \
     phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl && \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
-    sudo sed -i "s/listen = /home/land\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /home/land/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
+    sudo sed -i "s/listen = \/home\/land\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /home/land/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
     sudo sed -i "s/short_open_tag = Off/short_open_tag = On/" /home/land/.phpbrew/php/php-7.1/etc/php.ini && \
     sudo mkdir -p /etc/nginx/vhosts && sudo rm -f /etc/nginx/nginx.conf && \
     # Config ssh login container
