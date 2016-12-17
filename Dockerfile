@@ -4,10 +4,11 @@ MAINTAINER Ice Dragon <517icedragon@gmail.com>
 #install nginx/php-5.3/phpbrew/php-7.1 +default +mysql +pdo +fpm +curl +memcached
 RUN yum install -y sudo-devel && \
     useradd land && \
-    sed -i '$a land    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers && \
-    su land
-RUN cd ~ && \
-    sudo yum install -y \
+    sed -i '$a land    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers
+
+USER land
+
+RUN sudo yum install -y \
     gcc \
     libxml2-devel \
     libxslt-devel \
@@ -33,9 +34,9 @@ RUN cd ~ && \
     curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew && \
     chmod +x phpbrew && \
     sudo mv phpbrew /usr/bin/phpbrew && \
-    cd ~ && phpbrew init && \
-    echo "[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc" >> ~/.bashrc && \
-    source ~/.phpbrew/bashrc && \
+    phpbrew init --root=/home/land && \
+    echo "[[ -e /home/land/.phpbrew/bashrc ]] && source /home/land/.phpbrew/bashrc" >> /home/land/.bashrc && \
+    source /home/land/.phpbrew/bashrc && \
     wget http://www.atomicorp.com/installers/atomic && \
     sh ./atomic && \
     sudo yum  install -y  php-mcrypt  libmcrypt  libmcrypt-devel supervisor openssh-server git && \
@@ -49,8 +50,8 @@ RUN cd ~ && \
     sudo make install && \
     phpbrew ext install https://github.com/php-memcached-dev/php-memcached php7 -- --disable-memcached-sasl && \
     # Update the php-fpm config file, php.ini enable <? ?> tags and quieten logging.
-    sed -i "s/listen = ~\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" ~/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
-    sed -i "s/short_open_tag = Off/short_open_tag = On/" ~/.phpbrew/php/php-7.1/etc/php.ini && \
+    sed -i "s/listen = /home/land\/\.phpbrew\/php\/php-7\.1\/var\/run\/php-fpm\.sock/listen = 127\.0\.0\.1:9000/" /home/land/.phpbrew/php/php-7.1/etc/php-fpm.d/www.conf && \
+    sed -i "s/short_open_tag = Off/short_open_tag = On/" /home/land/.phpbrew/php/php-7.1/etc/php.ini && \
     sudo mkdir -p /etc/nginx/vhosts && sudo rm -f /etc/nginx/nginx.conf && \
     # Config ssh login container
     sudo sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
@@ -58,7 +59,7 @@ RUN cd ~ && \
     ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -P '' && \
     ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P '' && \
     ## Public keys dir
-    sudo mkdir -p ~/.ssh/id_rsa.pub/
+    sudo mkdir -p /home/land/.ssh/id_rsa.pub/
 
 
 # Manually set up the nginx log dir,php.ini and php-fpm config file environment variables
@@ -79,9 +80,9 @@ ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
 WORKDIR /home/land
 # start-up nginx and fpm and ssh
-CMD su land && sudo service nginx start && \
+CMD sudo service nginx start && \
     cd /home/land && \
-    phpbrew init && \
+    phpbrew init --root=/home/land && \
     [[ -e /home/land/.phpbrew/bashrc ]] && \
     source /home/land/.phpbrew/bashrc && \
     phpbrew use php-7.1 && \
