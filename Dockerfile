@@ -58,8 +58,8 @@ RUN sudo yum install -y \
     # Config ssh login container
     sudo sed -i "s/#RSAAuthentication yes/RSAAuthentication yes/" /etc/ssh/sshd_config && \
     sudo sed -i "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config && \
-    ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -P '' && \
-    ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P '' && \
+    sudo ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -P '' && \
+    sudo ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P '' && \
     ## Public keys dir
     sudo mkdir -p /home/land/.ssh/id_rsa.pub/
 
