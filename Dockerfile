@@ -8,6 +8,8 @@ RUN yum install -y sudo-devel && \
 
 USER land
 
+WORKDIR /home/land
+
 RUN sudo yum install -y \
     gcc \
     libxml2-devel \
@@ -78,7 +80,6 @@ ADD config/vhosts/* /etc/nginx/vhosts/
 # Update the enable public keys
 ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
-WORKDIR /home/land
 # start-up nginx and fpm and ssh
 CMD sudo service nginx start && \
     cd /home/land && \
