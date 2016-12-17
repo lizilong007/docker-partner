@@ -81,7 +81,7 @@ ADD config/vhosts/* /etc/nginx/vhosts/
 ADD config/id_rsa/*.pub.enabled /home/land/.ssh/id_rsa.pub/
 
 # start-up nginx and fpm and ssh
-CMD sudo service nginx start && \
+CMD su - land -c "sudo service nginx start && \
     cd /home/land && \
     phpbrew init --root=/home/land && \
     [[ -e /home/land/.phpbrew/bashrc ]] && \
@@ -90,6 +90,6 @@ CMD sudo service nginx start && \
     phpbrew fpm start && \
     cat /home/land/.ssh/id_rsa.pub/*.pub.enabled > /home/land/.ssh/authorized_keys && \
     sudo chmod 600 /home/land/.ssh/authorized_keys && \
-    sudo /usr/sbin/sshd -D
+    sudo /usr/sbin/sshd -D"
 
 
